@@ -1,0 +1,63 @@
+name: MediLink Continuous Integration
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  validate-client:
+    name: Lint & Build Frontend (React + Vite)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: Harshil_WAD/client/package-lock.json
+
+      - name: Install Client Dependencies
+        run: |
+          cd client || cd Harshil_WAD/client
+          npm ci
+
+      - name: Run Client Linter (Oxlint)
+        run: |
+          cd client || cd Harshil_WAD/client
+          npm run lint
+
+      - name: Build Client Bundle
+        run: |
+          cd client || cd Harshil_WAD/client
+          npm run build
+
+  validate-server:
+    name: Validate Backend (Node.js + Express)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: Harshil_WAD/server/package-lock.json
+
+      - name: Install Server Dependencies
+        run: |
+          cd server || cd Harshil_WAD/server
+          npm ci
+
+      - name: Check Syntax of Server Entry Point
+        run: |
+          cd server || cd Harshil_WAD/server
+          node --check src/server.js
